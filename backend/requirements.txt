@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+asyncpg
+pydantic
+pydantic-settings
+pandas
+openpyxl
+python-multipart
