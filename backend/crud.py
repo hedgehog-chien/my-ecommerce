@@ -164,9 +164,19 @@ async def create_sales_order(db: AsyncSession, order: schemas.OrderCreate):
 async def get_sales_orders(db: AsyncSession, skip: int = 0, limit: int = 100):
     result = await db.execute(
         select(models.SalesOrder)
-        .options(selectinload(models.SalesOrder.items))
+        .options(
+            selectinload(models.SalesOrder.items).selectinload(models.SalesItem.product)
+        )
         .offset(skip)
         .limit(limit)
     )
     return result.scalars().all()
+
+async def delete_all_sales_orders(db: AsyncSession):
+    # Depending on cascade rules, deleting orders might autoflush items.
+    # explicit delete of items first is safer if cascade isn't set up perfectly.
+    await db.execute(models.SalesItem.__table__.delete())
+    await db.execute(models.SalesOrder.__table__.delete())
+    await db.commit()
+
 

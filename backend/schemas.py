@@ -94,3 +94,12 @@ class Order(OrderBase):
     class Config:
         from_attributes = True
 
+
+# --- Inventory Adjustment ---
+class InventoryAdjustmentBase(BaseModel):
+    product_id: str
+    change_qty: int # Positive to add, negative to remove
+    reason: Optional[str] = None
+
+class InventoryAdjustmentCreate(InventoryAdjustmentBase):
+    pass

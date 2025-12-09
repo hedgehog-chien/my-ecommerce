@@ -68,6 +68,10 @@ class SalesOrder(Base):
 
     items = relationship("SalesItem", back_populates="order", cascade="all, delete-orphan")
 
+    @property
+    def platform_order_id(self):
+        return self.order_no
+
 class SalesItem(Base):
     __tablename__ = "sales_items"
 
@@ -81,3 +85,19 @@ class SalesItem(Base):
 
     order = relationship("SalesOrder", back_populates="items")
     product = relationship("Product", back_populates="sales_items")
+
+    @property
+    def product_name(self):
+        return self.product.name if self.product else "Unknown"
+
+    @property
+    def quantity(self):
+        return self.qty
+
+    @property
+    def unit_price(self):
+        return self.unit_price_sold
+    
+    @property
+    def total_price(self):
+        return self.qty * self.unit_price_sold

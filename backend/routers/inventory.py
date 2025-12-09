@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
 import database
 import models
+import schemas
 
 router = APIRouter(
     prefix="/inventory",
@@ -25,3 +26,28 @@ async def get_inventory_stats(db: AsyncSession = Depends(database.get_db)):
         "total_active_products": total_products,
         "total_inventory_value_twd": total_value
     }
+
+@router.post("/adjust")
+async def adjust_inventory(adjustment: schemas.InventoryAdjustmentCreate, db: AsyncSession = Depends(database.get_db)):
+    # Get Product
+    result = await db.execute(select(models.Product).filter(models.Product.id == adjustment.product_id))
+    product = result.scalars().first()
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Update Qty
+    if product.current_qty is None:
+        product.current_qty = 0
+    
+    product.current_qty += adjustment.change_qty
+    
+    # Optional: Log reason to a new table 'InventoryLog' if needed in future
+    # for now, just update state
+    
+    db.add(product)
+    await db.commit()
+    await db.refresh(product)
+    
+    return {"message": "Inventory updated", "new_qty": product.current_qty}
+
