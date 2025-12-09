@@ -37,6 +37,15 @@ async def upload_sales_excel(file: UploadFile = File(...), db: AsyncSession = De
         print(f"Upload error: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to process file: {str(e)}")
 
+@router.put("/{order_id}/items", response_model=schemas.Order)
+async def update_order_items(order_id: str, updates: schemas.OrderUpdateItems, db: AsyncSession = Depends(database.get_db)):
+    try:
+        return await crud.update_sales_order_items(db, order_id, updates)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.delete("/all")
 async def delete_all_orders(db: AsyncSession = Depends(database.get_db)):
     try:

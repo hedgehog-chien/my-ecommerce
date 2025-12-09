@@ -179,4 +179,67 @@ async def delete_all_sales_orders(db: AsyncSession):
     await db.execute(models.SalesOrder.__table__.delete())
     await db.commit()
 
+async def delete_all_products(db: AsyncSession):
+    # This might fail if there are foreign keys from sales/purchases not cleared first.
+    # So we should ideally clear those first or ensure cascade.
+    await db.execute(models.Product.__table__.delete())
+    await db.commit()
 
+async def delete_all_purchases(db: AsyncSession):
+    await db.execute(models.PurchaseItem.__table__.delete())
+    await db.execute(models.PurchaseBatch.__table__.delete())
+    await db.commit()
+
+async def clear_all_data(db: AsyncSession):
+    # Order matters due to Foreign Keys
+    await delete_all_sales_orders(db)
+    await delete_all_purchases(db)
+    await delete_all_products(db)
+
+
+
+
+async def update_sales_order_items(db: AsyncSession, order_id: str, updates: schemas.OrderUpdateItems):
+    # Get current order with items
+    stmt = select(models.SalesOrder).options(selectinload(models.SalesOrder.items)).filter(models.SalesOrder.id == order_id)
+    result = await db.execute(stmt)
+    order = result.scalars().first()
+    
+    if not order:
+        raise ValueError("Order not found")
+
+    # Map existing items by ID for easy access
+    existing_items = {item.id: item for item in order.items}
+
+    for update_item in updates.items:
+        if update_item.id in existing_items:
+            db_item = existing_items[update_item.id]
+            
+            # Handle Quantity Change -> Inventory Impact
+            old_qty = db_item.qty
+            new_qty = update_item.quantity
+            
+            if old_qty != new_qty:
+                qty_diff = new_qty - old_qty
+                
+                # Fetch product to update inventory
+                product_stmt = select(models.Product).filter(models.Product.id == db_item.product_id)
+                prod_result = await db.execute(product_stmt)
+                product = prod_result.scalars().first()
+                
+                if product:
+                     # If we sold MORE, stock goes DOWN. 
+                     # diff = 5 - 3 = +2. current -= 2.
+                     product.current_qty -= qty_diff
+                     db.add(product)
+                
+                db_item.qty = new_qty
+            
+            # Handle Price Change
+            db_item.unit_price_sold = update_item.unit_price
+            
+            db.add(db_item)
+    
+    await db.commit()
+    await db.refresh(order)
+    return order

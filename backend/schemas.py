@@ -103,3 +103,12 @@ class InventoryAdjustmentBase(BaseModel):
 
 class InventoryAdjustmentCreate(InventoryAdjustmentBase):
     pass
+
+class OrderItemUpdate(BaseModel):
+    id: str
+    quantity: int
+    unit_price: int
+
+class OrderUpdateItems(BaseModel):
+    items: List[OrderItemUpdate]
+

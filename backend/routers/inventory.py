@@ -51,3 +51,15 @@ async def adjust_inventory(adjustment: schemas.InventoryAdjustmentCreate, db: As
     
     return {"message": "Inventory updated", "new_qty": product.current_qty}
 
+@router.delete("/clear")
+async def clear_all_data(db: AsyncSession = Depends(database.get_db)):
+    """
+    DANGER: Clears ALL data (Products, Sales, Purchases).
+    Use for testing reset.
+    """
+    import crud
+    try:
+        await crud.clear_all_data(db)
+        return {"message": "All data cleared successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
