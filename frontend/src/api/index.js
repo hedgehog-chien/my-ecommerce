@@ -44,6 +44,9 @@ export default {
     deleteAllSalesOrders() {
         return apiClient.delete('/sales/all');
     },
+    updateSalesOrderItems(orderId, items) {
+        return apiClient.put(`/sales/${orderId}/items`, { items });
+    },
 
 
     // Inventory Stats
@@ -51,12 +54,18 @@ export default {
         return apiClient.get('/inventory/stats');
     },
 
-    // Dashboard Stats (Combined)
+    // Dashboard Stats (Mock/Computed for now)
     getDashboardStats() {
+        // In a real app, this might be a dedicated endpoint
         return Promise.all([
             this.getSalesOrders(),
             this.getProducts(),
-            this.getInventoryStats()
+            this.getPurchases()
         ]);
+    },
+
+    // System
+    resetInventory() {
+        return apiClient.delete('/inventory/clear');
     }
 };

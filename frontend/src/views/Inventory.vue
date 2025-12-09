@@ -5,15 +5,24 @@
         <h2 class="text-3xl font-bold text-slate-800">庫存管理</h2>
         <p class="text-slate-500 mt-1">管理您的商品庫存與成本資訊。</p>
       </div>
-      <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
-        + 新增商品
-      </button>
+      <div class="flex gap-4">
+        <button @click="handleReset" class="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-red-500/30 transition-all transform hover:-translate-y-0.5">
+          <TrashIcon class="w-4 h-4" />
+          重置系統
+        </button>
+        <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
+          <PlusIcon class="w-4 h-4" />
+          新增商品
+        </button>
+      </div>
     </div>
 
     <!-- Filters & Search -->
     <div class="glass-card p-4 flex gap-4">
       <div class="relative flex-1">
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <MagnifyingGlassIcon class="w-5 h-5" />
+        </span>
         <input 
           type="text" 
           placeholder="搜尋商品名稱或 SKU..." 
@@ -68,8 +77,12 @@
               </td>
               <td class="p-4">
                 <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button class="text-blue-500 hover:text-blue-700">✏️</button>
-                  <button class="text-red-500 hover:text-red-700">🗑️</button>
+                  <button class="text-blue-500 hover:text-blue-700">
+                    <PencilSquareIcon class="w-5 h-5" />
+                  </button>
+                  <button class="text-red-500 hover:text-red-700">
+                    <TrashIcon class="w-5 h-5" />
+                  </button>
                 </div>
               </td>
             </tr>
@@ -92,7 +105,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { 
+  TrashIcon, 
+  PlusIcon, 
+  MagnifyingGlassIcon, 
+  PencilSquareIcon 
+} from '@heroicons/vue/24/outline';
 import api from '../api';
+
 
 const products = ref([]);
 const loading = ref(false);
@@ -106,6 +126,19 @@ const fetchProducts = async () => {
     console.error('Failed to fetch products:', error);
   } finally {
     loading.value = false;
+  }
+};
+
+const handleReset = async () => {
+  if (confirm('警告：此操作將刪除所有「商品」、「訂單」與「採購」資料，且無法復原！\n\n確定要重置系統嗎？')) {
+    try {
+      await api.resetInventory();
+      alert('系統已重置！');
+      await fetchProducts();
+    } catch (error) {
+      console.error('Reset failed:', error);
+      alert('重置失敗，請檢查後端連線。');
+    }
   }
 };
 

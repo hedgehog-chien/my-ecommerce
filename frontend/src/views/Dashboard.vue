@@ -7,11 +7,13 @@
         <p class="text-slate-500 mt-1">庫存成效總覽。</p>
       </div>
       <div class="flex space-x-3">
-        <button class="px-4 py-2 bg-white/50 hover:bg-white text-slate-600 rounded-lg text-sm font-medium transition-colors shadow-sm">
+        <button class="flex items-center gap-2 px-4 py-2 bg-white/50 hover:bg-white text-slate-600 rounded-lg text-sm font-medium transition-colors shadow-sm">
+          <ArrowDownTrayIcon class="w-4 h-4" />
           匯出報表
         </button>
-        <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
-          + 新增訂單
+        <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">
+          <PlusIcon class="w-4 h-4" />
+          新增訂單
         </button>
       </div>
     </div>
@@ -29,7 +31,7 @@
             </p>
           </div>
           <div class="p-3 rounded-xl bg-opacity-10" :class="[stat.colorBg, stat.colorText]">
-            <span class="text-xl">{{ stat.icon }}</span>
+            <component :is="stat.icon" class="w-6 h-6" />
           </div>
         </div>
       </div>
@@ -69,13 +71,21 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { 
+  CurrencyDollarIcon, 
+  ShoppingBagIcon, 
+  TagIcon, 
+  ExclamationTriangleIcon, 
+  ArrowDownTrayIcon, 
+  PlusIcon 
+} from '@heroicons/vue/24/outline';
 import api from '../api';
 
 const stats = ref([
-  { title: '總營收', value: '$0', trend: 0, icon: '💰', colorBg: 'bg-emerald-500', colorText: 'text-emerald-500' },
-  { title: '總訂單數', value: '0', trend: 0, icon: '📦', colorBg: 'bg-blue-500', colorText: 'text-blue-500' },
-  { title: '上架商品', value: '0', trend: 0, icon: '🏷️', colorBg: 'bg-purple-500', colorText: 'text-purple-500' },
-  { title: '低庫存警示', value: '0', trend: 0, icon: '⚠️', colorBg: 'bg-orange-500', colorText: 'text-orange-500' },
+  { title: '總營收', value: '$0', trend: 0, icon: CurrencyDollarIcon, colorBg: 'bg-emerald-500', colorText: 'text-emerald-500' },
+  { title: '總訂單數', value: '0', trend: 0, icon: ShoppingBagIcon, colorBg: 'bg-blue-500', colorText: 'text-blue-500' },
+  { title: '上架商品', value: '0', trend: 0, icon: TagIcon, colorBg: 'bg-purple-500', colorText: 'text-purple-500' },
+  { title: '低庫存警示', value: '0', trend: 0, icon: ExclamationTriangleIcon, colorBg: 'bg-orange-500', colorText: 'text-orange-500' },
 ]);
 
 const recentOrders = ref([]);

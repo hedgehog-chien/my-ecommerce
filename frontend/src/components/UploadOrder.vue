@@ -18,16 +18,14 @@
         @dragleave="isDragging = false"
       >
         <div class="mb-4 text-blue-500 group-hover:scale-110 transition-transform duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
+          <CloudArrowUpIcon class="h-16 w-16 mx-auto" />
         </div>
         
         <p v-if="!file" class="text-lg font-medium text-slate-600">
           點擊或拖曳檔案至此區域上傳
         </p>
         <div v-else class="flex items-center justify-center space-x-2 bg-blue-100 p-2 rounded-lg inline-block">
-          <span class="text-2xl">📄</span>
+          <DocumentTextIcon class="w-6 h-6 text-blue-600" />
           <span class="font-bold text-slate-700">{{ file.name }}</span>
         </div>
         
@@ -53,7 +51,10 @@
             </svg>
             處理中...
           </span>
-          <span v-else>匯入訂單</span>
+          <span v-else class="flex items-center gap-2">
+            <ArrowUpTrayIcon class="w-5 h-5" />
+            匯入訂單
+          </span>
         </button>
       </div>
 
@@ -67,19 +68,28 @@
       <h3 class="text-xl font-bold text-slate-800 mb-6 text-center">匯入結果統計</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Created Orders -->
-        <div class="bg-green-50 p-6 rounded-2xl border border-green-100 text-center">
+        <div class="bg-green-50 p-6 rounded-2xl border border-green-100 text-center flex flex-col items-center">
+          <div class="p-3 bg-green-100 rounded-full mb-3 text-green-600">
+            <ClipboardDocumentCheckIcon class="w-8 h-8" />
+          </div>
           <div class="text-3xl font-bold text-green-600 mb-2">{{ resultSummary.created_orders }}</div>
           <div class="text-sm font-medium text-green-800">新增訂單</div>
         </div>
         
         <!-- Skipped Orders -->
-        <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 text-center">
+        <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 text-center flex flex-col items-center">
+          <div class="p-3 bg-amber-100 rounded-full mb-3 text-amber-600">
+            <DocumentDuplicateIcon class="w-8 h-8" />
+          </div>
           <div class="text-3xl font-bold text-amber-600 mb-2">{{ resultSummary.skipped_orders }}</div>
           <div class="text-sm font-medium text-amber-800">重複跳過</div>
         </div>
 
         <!-- Created Products -->
-        <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-center">
+        <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-center flex flex-col items-center">
+          <div class="p-3 bg-blue-100 rounded-full mb-3 text-blue-600">
+            <CubeIcon class="w-8 h-8" />
+          </div>
           <div class="text-3xl font-bold text-blue-600 mb-2">{{ resultSummary.created_products }}</div>
           <div class="text-sm font-medium text-blue-800">新增商品</div>
         </div>
@@ -90,7 +100,16 @@
 
 <script setup>
 import { ref } from 'vue';
+import { 
+  CloudArrowUpIcon, 
+  DocumentTextIcon, 
+  ArrowUpTrayIcon,
+  ClipboardDocumentCheckIcon,
+  DocumentDuplicateIcon,
+  CubeIcon
+} from '@heroicons/vue/24/outline';
 import api from '../api';
+
 
 const file = ref(null);
 const fileInput = ref(null);
